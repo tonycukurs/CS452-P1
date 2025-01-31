@@ -242,6 +242,70 @@ void test_notInList(void)
   free(data);
 }
 
+//tests that I added
+
+//test 1 adds multiple elements to the list
+void test_add_multiple(void)
+{
+    list_add(lst_, alloc_data(1));
+    list_add(lst_, alloc_data(2));
+    list_add(lst_, alloc_data(3));
+    TEST_ASSERT_TRUE(lst_->size == 3);
+
+    node_t *curr = lst_->head->next;
+    TEST_ASSERT_TRUE(*((int *)curr->data) == 3);
+    curr = curr->next;
+    TEST_ASSERT_TRUE(*((int *)curr->data) == 2);
+    curr = curr->next;
+    TEST_ASSERT_TRUE(*((int *)curr->data) == 1);
+}
+
+//test 2 removes elements to the middle of the list
+void test_remove_middle(void)
+{
+    populate_list();
+    int *rval = (int *)list_remove_index(lst_, 2);
+    TEST_ASSERT_TRUE(lst_->size == 4);
+    TEST_ASSERT_TRUE(*rval == 2);
+    free(rval);
+
+    node_t *curr = lst_->head->next;
+    // List should be 4->3->1->0
+    int expected[] = {4, 3, 1, 0};
+    for (int i = 0; i < 4; i++)
+    {
+        TEST_ASSERT_TRUE(*((int *)curr->data) == expected[i]);
+        curr = curr->next;
+    }
+}
+
+//test 3 removes elements from an empty list
+void test_remove_from_empty(void)
+{
+    void *rval = list_remove_index(lst_, 0);
+    TEST_ASSERT_TRUE(rval == NULL);
+    TEST_ASSERT_TRUE(lst_->size == 0);
+}
+
+//test 4 adding and removing elements repeatedly
+void test_add_remove_repeatedly(void)
+{
+    for (int i = 0; i < 10; i++)
+    {
+        list_add(lst_, alloc_data(i));
+    }
+    TEST_ASSERT_TRUE(lst_->size == 10);
+
+    for (int i = 0; i < 10; i++)
+    {
+        int *rval = (int *)list_remove_index(lst_, 0);
+        TEST_ASSERT_TRUE(*rval == 9 - i);
+        free(rval);
+    }
+    TEST_ASSERT_TRUE(lst_->size == 0);
+}
+
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_create_destroy);
@@ -255,5 +319,9 @@ int main(void) {
   RUN_TEST(test_indexOf0);
   RUN_TEST(test_indexOf3);
   RUN_TEST(test_notInList);
+  RUN_TEST(test_add_multiple);
+  RUN_TEST(test_remove_middle);
+  RUN_TEST(test_remove_from_empty);
+  RUN_TEST(test_add_remove_repeatedly);
   return UNITY_END();
 }
